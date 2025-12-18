@@ -180,54 +180,66 @@ tab_analyse, tab_rapport, tab_chat = st.tabs([
 ])
 
 with tab_analyse:
-    if st.button("Lancer l'analyse Temporelle"):
-        with st.spinner("Analyse..."):
-            st.markdown(
-                get_ai_analysis(contexte_ia, mode="tendance")
-            )
+    st.markdown("##### 🛠️ Outils d'aide à la décision")
+    
+    # BOITE 1 : TENDANCES
+    with st.container(border=True):
+        st.markdown("### 📈 Analyse des Tendances")
+        
+        if st.button("Lancer l'analyse Temporelle", key="btn_tend"):
+            with st.spinner("Analyse de l'historique..."):
+                res = get_ai_analysis(contexte_ia, mode="tendance")
+                st.markdown(f"**Résultat :**\n\n{res}")
 
-    if st.button("Lancer l'analyse Contextuelle"):
-        with st.spinner("Analyse..."):
-            st.markdown(
-                get_ai_analysis(contexte_ia, mode="comparaison")
-            )
+    # BOITE 2 : COMPARAISON
+    with st.container(border=True):
+        st.markdown("### 🆚 Comparaison Contextuelle")
+        if st.button("Lancer l'analyse Contextuelle", key="btn_comp"):
+            with st.spinner("Calcul des ratios..."):
+                res = get_ai_analysis(contexte_ia, mode="comparaison")
+                st.markdown(f"**Résultat :**\n\n{res}")
 
+# --- ONGLET 2 : RAPPORT COMPLET ---
 with tab_rapport:
-    if st.button("⚡ Générer le Rapport"):
-        with st.spinner("Rédaction du rapport..."):
-            st.session_state["full_report"] = get_ai_analysis(
-                contexte_ia,
-                mode="rapport"
-            )
-
-    if "full_report" in st.session_state:
-        st.markdown(st.session_state["full_report"])
-        st.download_button(
-            "📥 Télécharger (.md)",
-            st.session_state["full_report"],
-            "rapport.md"
-        )
-
+    st.markdown("##### 📑 Synthèse Globale")
+    st.write("Génère un document complet reprenant tous les indicateurs.")
+    
+    if st.button(" Générer le Rapport PDF", type="primary"):
+        with st.spinner("Rédaction du rapport en cours..."):
+            res = get_ai_analysis(contexte_ia, mode="rapport")
+            st.session_state['full_report'] = res
+            
+    if 'full_report' in st.session_state:
+        st.markdown("---")
+        st.markdown(st.session_state['full_report'])
+        st.download_button("📥 Télécharger (.md)", st.session_state['full_report'], "rapport.md")
 with tab_chat:
+    st.markdown("##### 💬 Assistant Virtuel")
+    
+   
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
+    
     for msg in st.session_state.messages:
         with st.chat_message(msg["role"]):
             st.markdown(msg["content"])
 
+   
     if prompt := st.chat_input("Posez votre question..."):
-        st.session_state.messages.append(
-            {"role": "user", "content": prompt}
-        )
+        
+       
+        with st.chat_message("user"):
+            st.markdown(prompt)
+        
+        st.session_state.messages.append({"role": "user", "content": prompt})
+
+        
         with st.chat_message("assistant"):
-            with st.spinner("..."):
-                response = get_ai_analysis(
-                    contexte_ia,
-                    user_question=prompt,
-                    mode="chat"
-                )
+            with st.spinner("Analyse en cours..."):
+                response = get_ai_analysis(contexte_ia, user_question=prompt, mode="chat")
                 st.markdown(response)
-        st.session_state.messages.append(
-            {"role": "assistant", "content": response}
-        )
+           
+        st.session_state.messages.append({"role": "assistant", "content": response})
+        
+        st.rerun()
