@@ -53,11 +53,6 @@ cp .env.example .env
 uv run streamlit run app.py
 ```
 
-**Pour lancer la version Gradio (si configurée) :**
-```bash
-uv run python app.py
-```
-
 ## 🌐 Déploiement
 Le dashboard est accessible en ligne ici : [[Lien vers SafeCity Streamlit App]](https://projectsafecity-fwff9penvyvxsded7xqcbx.streamlit.app/)(#) 
 
