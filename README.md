@@ -11,7 +11,7 @@
 ## Installation du projet (méthode officielle)
 
 ### 1️⃣ Cloner le repository
-```bash
+
 git clone https://github.com/mariamenni/project_safecity.git
 cd project_safecity
 
