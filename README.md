@@ -1,6 +1,4 @@
 
-
-```markdown
 # 🛡️ SafeCity - Dashboard de Criminalité Urbaine
 
 **SafeCity** est un tableau de bord interactif conçu pour l'analyse de la criminalité urbaine en France. Il permet de visualiser les tendances par département, de comparer les territoires et de générer des analyses automatiques grâce à l'intelligence artificielle.
