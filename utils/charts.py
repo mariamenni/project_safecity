@@ -1,21 +1,34 @@
-# chart.py
 import plotly.express as px
-import pandas as pd
 
 def map_choropleth(gdf_filtered):
     geojson = gdf_filtered.__geo_interface__
-    fig = px.choropleth(
+
+    fig = px.choropleth_mapbox(
         gdf_filtered,
         geojson=geojson,
         locations=gdf_filtered.index,
         color="taux_pour_100k",
         hover_name="nom",
-        hover_data={"nombre": True, "population": True},
+        hover_data={
+            "nombre": True,
+            "population": True,
+            "taux_pour_100k": True
+        },
         color_continuous_scale="Reds",
-        projection="mercator"
+        mapbox_style="carto-positron",
+        zoom=4.0,                
+        center={"lat": 46.5, "lon": 2.0},  
+        opacity=0.7
     )
-    fig.update_geos(fitbounds="locations", visible=False)
-    fig.update_layout(margin={"r":0,"t":0,"l":0,"b":0})
+
+    fig.update_layout(
+        margin={"r":0,"t":0,"l":0,"b":0},
+        coloraxis_colorbar=dict(
+            title="Taux / 100k",
+            ticks="outside"
+        )
+    )
+
     return fig
 
 def evolution_nationale(df_history, delit):

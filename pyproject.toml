@@ -22,4 +22,6 @@ dependencies = [
     "requests>=2.32.5",
     "streamlit>=1.52.2",
     "transformers>=4.57.3",
+    "groq>=1.0.0",
+    "pytest>=9.0.2",
 ]
