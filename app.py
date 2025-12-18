@@ -107,68 +107,76 @@ Département le plus sûr : {meilleur_dept['nom']}
 Le département critique est {pire_dept['taux_pour_100k']/taux_moyen:.1f}x supérieur à la moyenne.
 """
 
-# --- 8. SECTION INTELLIGENCE ARTIFICIELLE (Design Amélioré) ---
+
+
+# --- 8. SECTION INTELLIGENCE ARTIFICIELLE (Design "Cards") ---
 st.markdown("---")
-st.subheader("🤖 Assistant SafeCity")
+st.subheader("🤖 SafeCity AI Studio")
 
-# On utilise des onglets pour séparer les modes d'interaction
-tab_rapport, tab_chat = st.tabs(["📄 Rapport d'Analyse", "💬 Discussion Interactive"])
+# 3 Onglets clairs pour séparer les usages
+tab_analyse, tab_rapport, tab_chat = st.tabs([
+    "🔍 Analyses Ciblées", 
+    "📄 Rapport Complet", 
+    "💬 Chatbot"
+])
 
-# --- ONGLET 1 : LE RAPPORT ---
-with tab_rapport:
-    st.markdown("#### Synthèse automatique")
-    st.caption("Cliquez ci-dessous pour générer une analyse complète basée sur les filtres actifs.")
+# --- ONGLET 1 : ANALYSES CIBLÉES (Tendances & Comparaison) ---
+with tab_analyse:
+    st.markdown("##### 🛠️ Outils d'aide à la décision")
     
-    col_btn, col_rest = st.columns([1, 4])
-    with col_btn:
-        generate_btn = st.button("⚡ Générer l'analyse", type="primary")
-    
-    # Génération
-    if generate_btn:
-        with st.spinner("L'IA analyse les tendances..."):
-            rapport = get_ai_analysis(contexte_ia)
-            st.session_state['rapport_memoire'] = rapport
-    
-    # Affichage + BOUTON EXPORT 
-    if 'rapport_memoire' in st.session_state:
-        st.markdown("---")
-        st.markdown(st.session_state['rapport_memoire'])
-        st.success("✅ Analyse générée.")
+    # BOITE 1 : TENDANCES
+    with st.container(border=True):
+        st.markdown("### 📈 Analyse des Tendances")
+        st.write("Cet outil analyse l'évolution temporelle (N vs N-1) pour détecter les ruptures.")
         
-        # --- AJOUT POUR VALIDER L'EXPORT ---
-        st.download_button(
-            label="📥 Télécharger le rapport (PDF/TXT)",
-            data=st.session_state['rapport_memoire'],
-            file_name=f"Rapport_SafeCity_{annee}_{delit}.md",
-            mime="text/markdown"
-        )
+        if st.button("Lancer l'analyse Temporelle", key="btn_tend"):
+            with st.spinner("Analyse de l'historique..."):
+                res = get_ai_analysis(contexte_ia, mode="tendance")
+                st.markdown(f"**Résultat :**\n\n{res}")
 
-# --- ONGLET 2 : LE CHATBOT ---
+    # BOITE 2 : COMPARAISON
+    with st.container(border=True):
+        st.markdown("### 🆚 Comparaison Contextuelle")
+        st.write("Cet outil met en perspective les chiffres locaux face à la moyenne nationale.")
+        
+        if st.button("Lancer l'analyse Contextuelle", key="btn_comp"):
+            with st.spinner("Calcul des ratios..."):
+                res = get_ai_analysis(contexte_ia, mode="comparaison")
+                st.markdown(f"**Résultat :**\n\n{res}")
+
+# --- ONGLET 2 : RAPPORT COMPLET ---
+with tab_rapport:
+    st.markdown("##### 📑 Synthèse Globale")
+    st.write("Génère un document complet reprenant tous les indicateurs.")
+    
+    if st.button("⚡ Générer le Rapport ", type="primary"):
+        with st.spinner("Rédaction du rapport en cours..."):
+            res = get_ai_analysis(contexte_ia, mode="rapport")
+            st.session_state['full_report'] = res
+            
+    if 'full_report' in st.session_state:
+        st.markdown("---")
+        st.markdown(st.session_state['full_report'])
+        st.download_button("📥 Télécharger (.md)", st.session_state['full_report'], "rapport.md")
+
+# --- ONGLET 3 : CHATBOT ---
 with tab_chat:
-    st.markdown("#### Posez vos questions aux données")
-    st.caption("Exemples : *Pourquoi cette hausse ?*, *Compare avec 2020*, *Est-ce inquiétant ?*")
-
-    # Initialisation de l'historique de chat s'il n'existe pas
+    st.markdown("##### 💬 Assistant Virtuel")
+    
     if "messages" not in st.session_state:
         st.session_state.messages = []
 
-    # Affiche les anciens messages de la session
-    for message in st.session_state.messages:
-        with st.chat_message(message["role"]):
-            st.markdown(message["content"])
+    for msg in st.session_state.messages:
+        with st.chat_message(msg["role"]):
+            st.markdown(msg["content"])
 
-    # Zone de saisie (En bas de l'onglet)
-    if prompt := st.chat_input("Votre question sur les statistiques..."):
-        # 1. Affiche le message de l'utilisateur
+    if prompt := st.chat_input("Posez votre question..."):
         with st.chat_message("user"):
             st.markdown(prompt)
-        # Ajoute à l'historique
         st.session_state.messages.append({"role": "user", "content": prompt})
 
-        # 2. Réponse de l'IA
         with st.chat_message("assistant"):
-            with st.spinner("Réflexion en cours..."):
-                response = get_ai_analysis(contexte_ia, user_question=prompt)
+            with st.spinner("..."):
+                response = get_ai_analysis(contexte_ia, user_question=prompt, mode="chat")
                 st.markdown(response)
-        # Ajoute à l'historique
         st.session_state.messages.append({"role": "assistant", "content": response})
