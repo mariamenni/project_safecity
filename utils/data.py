@@ -2,9 +2,13 @@ from pathlib import Path
 import duckdb
 import geopandas as gpd
 from shapely import wkt
+import streamlit as st
 
 def load_latest_parquet():
     files = sorted(Path("data/processed").glob("*.parquet"))
+    if not files:
+        raise FileNotFoundError("Aucun fichier parquet trouvé dans data/processed")
+
 
     con = duckdb.connect()
     df = con.execute(

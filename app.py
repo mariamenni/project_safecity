@@ -16,15 +16,10 @@ st.set_page_config(
 )
 
 # --- 2. CHARGEMENT DES DONNÉES ---
-@st.cache_data
-def get_data():
-    gdf = load_latest_parquet()
+try:
+    gdf = load_latest_parquet()  
     if gdf.crs is None:
         gdf = gdf.set_crs(epsg=4326)
-    return gdf
-
-try:
-    gdf = get_data()
 except Exception as e:
     st.error(f"Erreur de chargement : {e}. Avez-vous lancé l'ETL ?")
     st.stop()
